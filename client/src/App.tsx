@@ -26,14 +26,24 @@ function App() {
       setEvents(eventsData);
     } catch (err) {
       console.error('Error loading events:', err);
-      if (err.response?.status === 404) {
-        setError('API endpoint not found. Please check the deployment configuration.');
-      } else if (err.response?.status >= 500) {
-        setError('Server error. Please check the backend logs and database connection.');
-      } else if (err.code === 'NETWORK_ERROR' || err.message.includes('Network Error')) {
-        setError('Network error. Please check your internet connection and try again.');
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as any;
+        if (axiosError.response?.status === 404) {
+          setError('API endpoint not found. Please check the deployment configuration.');
+        } else if (axiosError.response?.status >= 500) {
+          setError('Server error. Please check the backend logs and database connection.');
+        } else {
+          setError(`Failed to load events: ${axiosError.message || 'Unknown error'}`);
+        }
+      } else if (err && typeof err === 'object' && 'code' in err) {
+        const networkError = err as any;
+        if (networkError.code === 'NETWORK_ERROR' || networkError.message?.includes('Network Error')) {
+          setError('Network error. Please check your internet connection and try again.');
+        } else {
+          setError(`Failed to load events: ${networkError.message || 'Unknown error'}`);
+        }
       } else {
-        setError(`Failed to load events: ${err.message || 'Unknown error'}`);
+        setError(`Failed to load events: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
     } finally {
       setLoading(false);
