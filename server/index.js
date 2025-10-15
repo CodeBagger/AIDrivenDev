@@ -12,7 +12,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Connect to database
-connectDB().catch(console.error);
+connectDB().catch((error) => {
+  console.error('Database connection failed:', error);
+  console.error('Make sure SUPABASE_URL and SUPABASE_ANON_KEY are set correctly');
+});
 
 // Routes
 app.get('/api/events', async (req, res) => {
@@ -144,7 +147,40 @@ app.delete('/api/events/:id', async (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  res.json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Test endpoint to verify database connection
+app.get('/api/test-db', async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase.from('events').select('count').limit(1);
+    
+    if (error) {
+      return res.status(500).json({ 
+        status: 'ERROR', 
+        message: 'Database connection failed',
+        error: error.message 
+      });
+    }
+    
+    res.json({ 
+      status: 'OK', 
+      message: 'Database connection successful',
+      data: data 
+    });
+  } catch (err) {
+    res.status(500).json({ 
+      status: 'ERROR', 
+      message: 'Database test failed',
+      error: err.message 
+    });
+  }
 });
 
 // Export the app for Vercel

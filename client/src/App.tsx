@@ -25,8 +25,16 @@ function App() {
       const eventsData = await eventService.getEvents();
       setEvents(eventsData);
     } catch (err) {
-      setError('Failed to load events. Please check if the server is running.');
       console.error('Error loading events:', err);
+      if (err.response?.status === 404) {
+        setError('API endpoint not found. Please check the deployment configuration.');
+      } else if (err.response?.status >= 500) {
+        setError('Server error. Please check the backend logs and database connection.');
+      } else if (err.code === 'NETWORK_ERROR' || err.message.includes('Network Error')) {
+        setError('Network error. Please check your internet connection and try again.');
+      } else {
+        setError(`Failed to load events: ${err.message || 'Unknown error'}`);
+      }
     } finally {
       setLoading(false);
     }

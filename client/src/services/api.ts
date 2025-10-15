@@ -3,6 +3,9 @@ import { Event, CreateEventRequest, UpdateEventRequest } from '../types/Event';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api');
 
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -13,8 +16,15 @@ const api = axios.create({
 export const eventService = {
   // Get all events
   getEvents: async (): Promise<Event[]> => {
-    const response = await api.get('/events');
-    return response.data;
+    try {
+      console.log('Making request to:', API_BASE_URL + '/events');
+      const response = await api.get('/events');
+      console.log('Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
   },
 
   // Get event by ID
