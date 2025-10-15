@@ -4,6 +4,7 @@ import './EventForm.css';
 
 interface EventFormProps {
   event?: Event | null;
+  selectedSlot?: { start: Date; end: Date } | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (eventData: CreateEventRequest | UpdateEventRequest) => void;
@@ -12,6 +13,7 @@ interface EventFormProps {
 
 const EventForm: React.FC<EventFormProps> = ({ 
   event, 
+  selectedSlot,
   isOpen, 
   onClose, 
   onSave, 
@@ -32,6 +34,13 @@ const EventForm: React.FC<EventFormProps> = ({
         start_date: new Date(event.start_date).toISOString().slice(0, 16),
         end_date: new Date(event.end_date).toISOString().slice(0, 16),
       });
+    } else if (selectedSlot) {
+      setFormData({
+        title: '',
+        description: '',
+        start_date: selectedSlot.start.toISOString().slice(0, 16),
+        end_date: selectedSlot.end.toISOString().slice(0, 16),
+      });
     } else {
       setFormData({
         title: '',
@@ -40,7 +49,7 @@ const EventForm: React.FC<EventFormProps> = ({
         end_date: '',
       });
     }
-  }, [event]);
+  }, [event, selectedSlot]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

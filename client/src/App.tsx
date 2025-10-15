@@ -95,31 +95,6 @@ function App() {
     }
   };
 
-  // Pre-fill form with selected slot data
-  const getInitialFormData = (): CreateEventRequest | UpdateEventRequest => {
-    if (selectedEvent) {
-      return {
-        id: selectedEvent.id,
-        title: selectedEvent.title,
-        description: selectedEvent.description,
-        start_date: new Date(selectedEvent.start_date).toISOString(),
-        end_date: new Date(selectedEvent.end_date).toISOString(),
-      };
-    } else if (selectedSlot) {
-      return {
-        title: '',
-        description: '',
-        start_date: selectedSlot.start.toISOString(),
-        end_date: selectedSlot.end.toISOString(),
-      };
-    }
-    return {
-      title: '',
-      description: '',
-      start_date: new Date().toISOString(),
-      end_date: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour later
-    };
-  };
 
   if (loading) {
     return (
@@ -158,6 +133,7 @@ function App() {
 
       <EventForm
         event={selectedEvent}
+        selectedSlot={selectedSlot}
         isOpen={isFormOpen}
         onClose={handleCloseForm}
         onSave={handleSaveEvent}
