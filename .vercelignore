@@ -1,0 +1,7 @@
+node_modules
+server
+*.md
+.git
+.gitignore
+start.bat
+start.sh
